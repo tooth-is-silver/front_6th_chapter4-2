@@ -1,9 +1,11 @@
 {
+  "homepage": "https://tooth-is-silver.github.io/front_6th_chapter4-2",
   "name": "10주차-성능최적화-2-심화과제",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "gh-pages": "pnpm run build && gh-pages -d dist",
     "dev": "vite",
     "test": "vitest",
     "test:ui": "vitest --ui",
@@ -39,6 +41,7 @@
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
+    "gh-pages": "^6.3.0",
     "tsx": "^4.17.0",
     "typescript": "^5.4.5",
     "vite": "npm:rolldown-vite@latest",
