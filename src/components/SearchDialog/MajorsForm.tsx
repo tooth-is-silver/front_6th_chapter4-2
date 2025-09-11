@@ -15,7 +15,6 @@ import { SearchOption } from "../../SearchDialog";
 
 type MajorsFormProps = {
   majors: Array<string>;
-  searchOptions: SearchOption;
   allMajors: Array<string>;
   changeSearchOption: (
     field: keyof SearchOption,
@@ -24,12 +23,7 @@ type MajorsFormProps = {
 };
 
 const MajorsForm = memo(
-  ({
-    majors,
-    searchOptions,
-    allMajors,
-    changeSearchOption,
-  }: MajorsFormProps) => {
+  ({ majors, allMajors, changeSearchOption }: MajorsFormProps) => {
     return (
       <FormControl>
         <FormLabel>전공</FormLabel>
@@ -41,14 +35,14 @@ const MajorsForm = memo(
           }
         >
           <Wrap spacing={1} mb={2}>
-            {searchOptions.majors.map((major) => (
+            {majors.map((major) => (
               <Tag key={major} size="sm" variant="outline" colorScheme="blue">
                 <TagLabel>{major.split("<p>").pop()}</TagLabel>
                 <TagCloseButton
                   onClick={() =>
                     changeSearchOption(
                       "majors",
-                      searchOptions.majors.filter((v) => v !== major)
+                      majors.filter((v) => v !== major)
                     )
                   }
                 />

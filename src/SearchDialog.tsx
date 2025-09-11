@@ -29,6 +29,7 @@ import DaysForm from "./components/SearchDialog/DaysForm.tsx";
 import TimesForm from "./components/SearchDialog/TimesForm.tsx";
 import MajorsForm from "./components/SearchDialog/MajorsForm.tsx";
 import CreditsForm from "./components/SearchDialog/CreditsForm.tsx";
+import LectureRow from "./components/SearchDialog/LectureRow.tsx";
 
 interface Props {
   searchInfo: {
@@ -120,10 +121,7 @@ const SearchDialog = ({ searchInfo, onClose }: Props) => {
       });
   });
 
-  const filteredLectures = useMemo(
-    () => getFilteredLectures(),
-    [getFilteredLectures]
-  );
+  const filteredLectures = getFilteredLectures();
   const lastPage = useMemo(
     () => Math.ceil(filteredLectures.length / PAGE_SIZE),
     [filteredLectures]
@@ -140,7 +138,7 @@ const SearchDialog = ({ searchInfo, onClose }: Props) => {
   const changeSearchOption = useAutoCallback(
     (field: keyof SearchOption, value: SearchOption[typeof field]) => {
       setPage(1);
-      setSearchOptions({ ...searchOptions, [field]: value });
+      setSearchOptions((prev) => ({ ...prev, [field]: value }));
       loaderWrapperRef.current?.scrollTo(0, 0);
     }
   );
@@ -238,13 +236,11 @@ const SearchDialog = ({ searchInfo, onClose }: Props) => {
             <HStack spacing={4}>
               <TimesForm
                 times={searchOptions.times}
-                searchOptions={searchOptions}
                 changeSearchOption={changeSearchOption}
               />
               <MajorsForm
                 majors={searchOptions.majors}
                 allMajors={allMajors}
-                searchOptions={searchOptions}
                 changeSearchOption={changeSearchOption}
               />
             </HStack>
@@ -266,31 +262,30 @@ const SearchDialog = ({ searchInfo, onClose }: Props) => {
 
               <Box overflowY="auto" maxH="500px" ref={loaderWrapperRef}>
                 <Table size="sm" variant="striped">
-                  <Tbody>
+                  <Tbody
+                    sx={{
+                      button: {
+                        bg: "green.500",
+                        color: "white",
+                        size: "sm",
+                        padding: "6px 12px",
+                        _hover: { bg: "green.600" },
+                      },
+                      "tr:hover": {
+                        bg: "gray.50",
+                      },
+                      td: {
+                        fontSize: "14px",
+                        padding: "12px",
+                      },
+                    }}
+                  >
                     {visibleLectures.map((lecture, index) => (
-                      <Tr key={`${lecture.id}-${index}`}>
-                        <Td width="100px">{lecture.id}</Td>
-                        <Td width="50px">{lecture.grade}</Td>
-                        <Td width="200px">{lecture.title}</Td>
-                        <Td width="50px">{lecture.credits}</Td>
-                        <Td
-                          width="150px"
-                          dangerouslySetInnerHTML={{ __html: lecture.major }}
-                        />
-                        <Td
-                          width="150px"
-                          dangerouslySetInnerHTML={{ __html: lecture.schedule }}
-                        />
-                        <Td width="80px">
-                          <Button
-                            size="sm"
-                            colorScheme="green"
-                            onClick={() => addSchedule(lecture)}
-                          >
-                            추가
-                          </Button>
-                        </Td>
-                      </Tr>
+                      <LectureRow
+                        key={`${lecture.id}-${index}`}
+                        lecture={lecture}
+                        addSchedule={addSchedule}
+                      />
                     ))}
                   </Tbody>
                 </Table>
