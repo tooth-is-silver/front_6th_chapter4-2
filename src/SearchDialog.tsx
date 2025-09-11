@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Box,
-  Button,
   HStack,
   Modal,
   ModalBody,
@@ -11,7 +10,6 @@ import {
   ModalOverlay,
   Table,
   Tbody,
-  Td,
   Text,
   Th,
   Thead,
