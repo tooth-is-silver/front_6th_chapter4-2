@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, memo } from "react";
 import {
   Box,
   HStack,
@@ -49,9 +49,29 @@ export interface SearchOption {
 
 const PAGE_SIZE = 100;
 
-const fetchMajors = () => axios.get<Lecture[]>("/schedules-majors.json");
+// API 캐시 시스템
+const createApiCache = () => {
+  const cache = new Map<string, Promise<{ data: Lecture[] }>>();
+
+  return (key: string, fetcher: () => Promise<{ data: Lecture[] }>) => {
+    if (cache.has(key)) {
+      return cache.get(key) as Promise<{ data: Lecture[] }>;
+    }
+
+    const promise = fetcher();
+    cache.set(key, promise);
+    return promise;
+  };
+};
+
+const apiCache = createApiCache();
+
+const fetchMajors = () =>
+  apiCache("majors", () => axios.get<Lecture[]>("/schedules-majors.json"));
 const fetchLiberalArts = () =>
-  axios.get<Lecture[]>("/schedules-liberal-arts.json");
+  apiCache("liberalArts", () =>
+    axios.get<Lecture[]>("/schedules-liberal-arts.json")
+  );
 
 // TODO: 이 코드를 개선해서 API 호출을 최소화 해보세요 + Promise.all이 현재 잘못 사용되고 있습니다. 같이 개선해주세요.
 const fetchAllLectures = async () =>
@@ -65,8 +85,8 @@ const fetchAllLectures = async () =>
   ]);
 
 // TODO: 이 컴포넌트에서 불필요한 연산이 발생하지 않도록 다양한 방식으로 시도해주세요.
-const SearchDialog = ({ searchInfo, onClose }: Props) => {
-  const { setSchedulesMap } = useScheduleContext();
+const SearchDialog = memo(({ searchInfo, onClose }: Props) => {
+  const { addSchedule } = useScheduleContext();
 
   const loaderWrapperRef = useRef<HTMLDivElement>(null);
   const loaderRef = useRef<HTMLDivElement>(null);
@@ -141,21 +161,11 @@ const SearchDialog = ({ searchInfo, onClose }: Props) => {
     }
   );
 
-  const addSchedule = useAutoCallback((lecture: Lecture) => {
+  const handleAddSchedule = useAutoCallback((lecture: Lecture) => {
     if (!searchInfo) return;
 
     const { tableId } = searchInfo;
-
-    const schedules = parseSchedule(lecture.schedule).map((schedule) => ({
-      ...schedule,
-      lecture,
-    }));
-
-    setSchedulesMap((prev) => ({
-      ...prev,
-      [tableId]: [...prev[tableId], ...schedules],
-    }));
-
+    addSchedule(tableId, lecture);
     onClose();
   });
 
@@ -282,7 +292,7 @@ const SearchDialog = ({ searchInfo, onClose }: Props) => {
                       <LectureRow
                         key={`${lecture.id}-${index}`}
                         lecture={lecture}
-                        addSchedule={addSchedule}
+                        addSchedule={handleAddSchedule}
                       />
                     ))}
                   </Tbody>
@@ -295,6 +305,8 @@ const SearchDialog = ({ searchInfo, onClose }: Props) => {
       </ModalContent>
     </Modal>
   );
-};
+});
+
+SearchDialog.displayName = "SearchDialog";
 
 export default SearchDialog;
