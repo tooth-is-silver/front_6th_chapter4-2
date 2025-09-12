@@ -8,7 +8,13 @@ import { useDndContext } from "@dnd-kit/core";
 import { useAutoCallback } from "./hooks/useAutoCallback.ts";
 
 export const ScheduleTables = () => {
-  const { schedulesMap, duplicateScheduleTable, deleteScheduleTable, removeSchedule, updateSchedules } = useScheduleContext();
+  const {
+    schedulesMap,
+    duplicateScheduleTable,
+    deleteScheduleTable,
+    removeSchedule,
+    updateSchedules,
+  } = useScheduleContext();
   const dndContext = useDndContext();
   const [searchInfo, setSearchInfo] = useState<{
     tableId: string;
@@ -28,9 +34,11 @@ export const ScheduleTables = () => {
 
   const activeTableId = getActiveTableId();
 
-  const openSearch = useAutoCallback((tableId: string, day?: string, time?: number) => {
-    setSearchInfo({ tableId, day, time });
-  });
+  const openSearch = useAutoCallback(
+    (tableId: string, day?: string, time?: number) => {
+      setSearchInfo({ tableId, day, time });
+    }
+  );
 
   return (
     <>
@@ -72,93 +80,92 @@ interface ScheduleCardProps {
   onRemoveSchedule: (tableId: string, day: string, time: number) => void;
 }
 
-const ScheduleCard = memo(({
-  index,
-  tableId,
-  schedules,
-  disabledRemoveButton,
-  isActive,
-  onOpenSearch,
-  onDuplicate,
-  onDelete,
-  onUpdateSchedules,
-  onRemoveSchedule
-}: ScheduleCardProps) => {
-  const handleScheduleTimeClick = useAutoCallback((timeInfo: { day: string; time: number }) => {
-    onOpenSearch(tableId, timeInfo.day, timeInfo.time);
-  });
+const ScheduleCard = memo(
+  ({
+    index,
+    tableId,
+    schedules,
+    disabledRemoveButton,
+    isActive,
+    onOpenSearch,
+    onDuplicate,
+    onDelete,
+    onUpdateSchedules,
+    onRemoveSchedule,
+  }: ScheduleCardProps) => {
+    const handleScheduleTimeClick = useAutoCallback(
+      (timeInfo: { day: string; time: number }) => {
+        onOpenSearch(tableId, timeInfo.day, timeInfo.time);
+      }
+    );
 
-  const handleDeleteButtonClick = useAutoCallback(({ day, time }: { day: string; time: number }) => {
-    onRemoveSchedule(tableId, day, time);
-  });
+    const handleDeleteButtonClick = useAutoCallback(
+      ({ day, time }: { day: string; time: number }) => {
+        onRemoveSchedule(tableId, day, time);
+      }
+    );
 
-  const handleSchedulesChange = useAutoCallback((updatedSchedules: any) => {
-    onUpdateSchedules(tableId, updatedSchedules);
-  });
+    const handleSchedulesChange = useAutoCallback((updatedSchedules: any) => {
+      onUpdateSchedules(tableId, updatedSchedules);
+    });
 
-  const handleAddSchedule = useAutoCallback(() => {
-    onOpenSearch(tableId);
-  });
+    const handleAddSchedule = useAutoCallback(() => {
+      onOpenSearch(tableId);
+    });
 
-  const handleDuplicate = useAutoCallback(() => {
-    onDuplicate(tableId);
-  });
+    const handleDuplicate = useAutoCallback(() => {
+      onDuplicate(tableId);
+    });
 
-  const handleDelete = useAutoCallback(() => {
-    onDelete(tableId);
-  });
+    const handleDelete = useAutoCallback(() => {
+      onDelete(tableId);
+    });
 
-  return (
-    <Stack width="600px">
-      <Flex 
-        justifyContent="space-between" 
-        alignItems="center"
-        outline={isActive ? "3px dashed" : undefined}
-        outlineColor="blue.400"
-        p={isActive ? 2 : 0}
-        borderRadius="md"
-        transition="all 0.2s"
-      >
-        <Heading as="h3" fontSize="lg">
-          시간표 {index + 1} {isActive && "🎯"}
-        </Heading>
-        <ButtonGroup size="sm" isAttached>
-          <Button
-            colorScheme="green"
-            onClick={handleAddSchedule}
-          >
-            시간표 추가
-          </Button>
-          <Button
-            colorScheme="green"
-            mx="1px"
-            onClick={handleDuplicate}
-          >
-            복제
-          </Button>
-          <Button
-            colorScheme="green"
-            isDisabled={disabledRemoveButton}
-            onClick={handleDelete}
-          >
-            삭제
-          </Button>
-        </ButtonGroup>
-      </Flex>
-      <ScheduleDndProvider
-        tableId={tableId}
-        schedules={schedules}
-        onSchedulesChange={handleSchedulesChange}
-      >
-        <ScheduleTable
-          schedules={schedules}
+    return (
+      <Stack width="600px">
+        <Flex
+          justifyContent="space-between"
+          alignItems="center"
+          outline={isActive ? "3px dashed" : undefined}
+          outlineColor="blue.400"
+          p={isActive ? 2 : 0}
+          borderRadius="md"
+          transition="all 0.2s"
+        >
+          <Heading as="h3" fontSize="lg">
+            시간표 {index + 1}
+          </Heading>
+          <ButtonGroup size="sm" isAttached>
+            <Button colorScheme="green" onClick={handleAddSchedule}>
+              시간표 추가
+            </Button>
+            <Button colorScheme="green" mx="1px" onClick={handleDuplicate}>
+              복제
+            </Button>
+            <Button
+              colorScheme="green"
+              isDisabled={disabledRemoveButton}
+              onClick={handleDelete}
+            >
+              삭제
+            </Button>
+          </ButtonGroup>
+        </Flex>
+        <ScheduleDndProvider
           tableId={tableId}
-          onScheduleTimeClick={handleScheduleTimeClick}
-          onDeleteButtonClick={handleDeleteButtonClick}
-        />
-      </ScheduleDndProvider>
-    </Stack>
-  );
-});
+          schedules={schedules}
+          onSchedulesChange={handleSchedulesChange}
+        >
+          <ScheduleTable
+            schedules={schedules}
+            tableId={tableId}
+            onScheduleTimeClick={handleScheduleTimeClick}
+            onDeleteButtonClick={handleDeleteButtonClick}
+          />
+        </ScheduleDndProvider>
+      </Stack>
+    );
+  }
+);
 
 ScheduleCard.displayName = "ScheduleCard";
