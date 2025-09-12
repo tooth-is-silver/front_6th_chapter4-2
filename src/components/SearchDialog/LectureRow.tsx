@@ -24,4 +24,6 @@ const LectureRow = memo(({ lecture, addSchedule }: LectureRowProps) => {
   );
 });
 
+LectureRow.displayName = "LectureRow";
+
 export default LectureRow;
