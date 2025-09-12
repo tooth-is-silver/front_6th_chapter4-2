@@ -67,10 +67,10 @@ const createApiCache = () => {
 const apiCache = createApiCache();
 
 const fetchMajors = () =>
-  apiCache("majors", () => axios.get<Lecture[]>("/schedules-majors.json"));
+  apiCache("majors", () => axios.get<Lecture[]>("./schedules-majors.json"));
 const fetchLiberalArts = () =>
   apiCache("liberalArts", () =>
-    axios.get<Lecture[]>("/schedules-liberal-arts.json")
+    axios.get<Lecture[]>("./schedules-liberal-arts.json")
   );
 
 // TODO: 이 코드를 개선해서 API 호출을 최소화 해보세요 + Promise.all이 현재 잘못 사용되고 있습니다. 같이 개선해주세요.
